@@ -1,0 +1,25 @@
+plugins {
+	id 'org.springframework.boot' version '2.6.7'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+}
+
+group = 'sk.catheaven'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation group: 'com.graphql-java', name: 'graphql-java', version: '18.1'
+	implementation group: 'com.graphql-java-kickstart', name: 'graphiql-spring-boot-starter', version: '11.1.0'
+	implementation group: 'com.graphql-java-kickstart', name: 'graphql-java-tools', version: '12.0.2'
+	implementation group: 'com.graphql-java-kickstart', name: 'graphql-spring-boot-starter', version: '12.0.0'
+
+	compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+	annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.6.7'
+}
