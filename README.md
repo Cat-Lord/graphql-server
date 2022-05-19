@@ -1,5 +1,8 @@
 # About
-This project is a sample backend application using GraphQL.
+This project is a sample backend application using GraphQL. Graphql implementation for Java is [available on
+GitHub](https://github.com/graphql-java-kickstart/graphql-spring-boot). Please be aware that sometimes I might 
+make a mistake in the word `GraphQL` and `GraphiQL` respectively, such as `GrahpQL`, `GrapihQL` or similar. 
+Use expected words in case you find this kind of error (unless specifically guided otherwise).
 
 # GraphQL & GraphQL Playground
 Running this example spins up a GraphQL server on `localhost:8080/graphql`. Available through 
@@ -111,3 +114,16 @@ implementation group: 'com.graphql-java-kickstart', name: 'graphql-spring-boot-s
 This configuration alone allows us to forget about the manual definitions and create resolvers and POJOs 
 and run without problems. In case this project changed or evolved, refer to git tag 'v.1.0-initial' on the
 main branch to see how little is required to run and example.
+
+# Naming convention and configuration
+Inspecting the code from GraphQL for Java on GitHub I decided to store some important notes.
+
+## Graphql Schema
+It is expected that the schema is located anywhere but ends with a `.graphqls` extension. Its location and structure is
+configurable via the `schemaLocationPattern` property.
+
+Default: `private String schemaLocationPattern = "**/*.graphqls";`
+
+## Graphql Server Location
+Can be changed in `application.properties` via `graphql.servlet.mapping=/your-endpoint`. Note that changing this
+location can affect other tools such as GraphiQL which expects schema to be at `/graphql`.
