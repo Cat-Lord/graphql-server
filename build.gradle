@@ -17,7 +17,6 @@ dependencies {
 	implementation group: 'com.graphql-java', name: 'graphql-java', version: '18.1'
 
 	implementation group: 'com.graphql-java-kickstart', name: 'graphql-java-tools', version: '12.0.2'
-	implementation group: 'com.graphql-java-kickstart', name: 'playground-spring-boot-starter', version: '11.1.0'
 
 	compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
 	annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
