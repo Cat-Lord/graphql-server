@@ -1,21 +1,3 @@
 schema {
     query: Query
 }
-
-type Query {
-    allBooks: [Book]
-    allAuthors: [Author]
-}
-
-type Book {
-    id: ID
-    name: String
-    pageCount: Int
-    authorID: ID
-}
-
-type Author {
-    id: ID
-    name: String
-}
-

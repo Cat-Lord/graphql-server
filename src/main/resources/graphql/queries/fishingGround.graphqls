@@ -1,0 +1,4 @@
+extend type Query {
+    allFishingGround: [FishingGround]
+    getFishingGroundStatistics: [FishingGroundStatistics]
+}

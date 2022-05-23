@@ -127,3 +127,71 @@ Default: `private String schemaLocationPattern = "**/*.graphqls";`
 ## Graphql Server Location
 Can be changed in `application.properties` via `graphql.servlet.mapping=/your-endpoint`. Note that changing this
 location can affect other tools such as GraphiQL which expects schema to be at `/graphql`.
+
+# Common Issues
+
+## GraphQL Server not available
+There is no GraphQL endpoint at `/graphql`. This can be caused by number of issues and one of them might be 
+missing query handlers. If there are no handler I suspect that the server doesn't even start. But be aware, 
+that creating a handler implementing GraphQLResolver interface isn't enough - it has to be picked up by Spring,
+so it is necessary to annotate it with `@Component` (or any other suitable annotation):
+
+```java
+
+@Component  // <- Important !
+public class MyResolver implements GraphQLQueryResolver {
+    ...
+}
+```
+
+## Complex Net of Dependencies
+If you are confused about what dependency has to be available and what is already used, you can take a look
+at Gradle. In IntelliJ in the Gradle tab there is a list of dependencies (runtime, implementation, etc.) and
+there is a little star next to the dependency if it was already included.
+
+```groovy
+com.graphql-java:graphql-java:18.1 (*)  // This dependency is omitted because it is already imported
+```
+
+You can safely remove these starred dependencies or can adjust the dependencies which import your starred
+ones.
+
+Dependencies at the start of the project, which worked as expected, were:
+
+- graphql-spring-boot-starter (graphql-kickstart project)
+- spring-boot-starter-web
+- lombok (optional)
+
+## Schema is not properly loaded / types not found
+Sometimes it can happen that even though the schema is defined and types are available, running
+the server results in a crash with a message that:
+
+- Root Query types couldn't be found
+- Type X couldn't be found
+- ...
+
+Other problem might be that server started but documentation shows only a part of schema available
+(for example we only have root query type and don't see queries of types that extend it):
+
+```graphql
+# schema.graphqls
+type Query {
+    rootQuery: RootResult # no problem, visible and callable from playground
+}
+
+# myType.graphql
+extends type Query {
+    customQuery: SomeResult # not visible, as if it wasn't loaded
+}
+```
+
+These errors are easily resolvable when you merge split graphql files into
+one single file, but that is not a feasible solution.
+
+I discovered that naming and **file extension matters**. While for some reason
+having files named `.graphql` works in a mysterious way (sometimes yes, sometimes no),
+naming them `.graphqls` is the safer option. 
+
+I suspect that root schema definitions **must** be in a `.graphqls` file. Providing the schema 
+with new types may be in a regular `.graphql` files and is fetched by the graphql-tools. 
+Nevertheless, I would always recommend to always extend files with `.graphqls`.
