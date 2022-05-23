@@ -1,0 +1,4 @@
+type Fish {
+    id: ID!
+    name: String!
+}

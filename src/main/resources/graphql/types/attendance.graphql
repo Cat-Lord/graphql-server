@@ -1,0 +1,6 @@
+type Attendance {
+     id: ID
+     fishingGround: FishingGround
+     numberOfVisits: [Int]
+     catches: [Catch]
+}

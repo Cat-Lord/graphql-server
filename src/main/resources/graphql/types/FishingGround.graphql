@@ -1,0 +1,5 @@
+type FishingGround {
+    id: ID
+    label: String!
+    code: String!
+}
