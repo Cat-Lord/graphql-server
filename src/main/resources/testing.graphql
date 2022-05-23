@@ -1,6 +1,0 @@
-{
-    allBooks {
-        name
-        pageCount
-    }
-}
