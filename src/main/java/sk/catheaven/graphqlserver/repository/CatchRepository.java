@@ -2,7 +2,7 @@ package sk.catheaven.graphqlserver.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import sk.catheaven.graphqlserver.domain.CatchStatistics;
+import sk.catheaven.graphqlserver.domain.statistics.CatchStatistics;
 import sk.catheaven.graphqlserver.domain.persistence.Catch;
 import sk.catheaven.graphqlserver.domain.persistence.FishingGround;
 
@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface CatchRepository extends JpaRepository<Catch, Long> {
     @Query("SELECT " +
-            "   new sk.catheaven.graphqlserver.domain.CatchStatistics(catch.fish, " +
+            "   new sk.catheaven.graphqlserver.domain.statistics.CatchStatistics(catch.fish, " +
                                                        "SUM(catch.totalAmount), " +
                                                        "SUM(catch.totalWeight)" +
             "                                          ) " +

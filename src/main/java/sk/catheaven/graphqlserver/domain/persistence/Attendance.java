@@ -1,6 +1,9 @@
 package sk.catheaven.graphqlserver.domain.persistence;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -14,7 +17,9 @@ import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "attendance")
 public class Attendance {
@@ -29,7 +34,15 @@ public class Attendance {
 
     private Integer numberOfVisits;
 
+    @Builder.Default
     @OneToMany(mappedBy = "attendance", cascade = CascadeType.ALL)
     private List<Catch> catches = new ArrayList<>();
 
+    public void setCatches(List<Catch> catches) {
+        this.catches.addAll(catches);
+    }
+
+    public Long getId() {
+        return id;
+    }
 }

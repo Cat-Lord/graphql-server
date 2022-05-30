@@ -1,4 +1,4 @@
-package sk.catheaven.graphqlserver.domain;
+package sk.catheaven.graphqlserver.domain.statistics;
 
 import lombok.Value;
 import sk.catheaven.graphqlserver.domain.persistence.Fish;

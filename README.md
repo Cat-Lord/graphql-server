@@ -195,3 +195,33 @@ naming them `.graphqls` is the safer option.
 I suspect that root schema definitions **must** be in a `.graphqls` file. Providing the schema 
 with new types may be in a regular `.graphql` files and is fetched by the graphql-tools. 
 Nevertheless, I would always recommend to always extend files with `.graphqls`.
+
+## Lombok @Builder with JPA repositories
+There is an issue with JPA repositories and the @Builder annotation. Using just pure builder annotation 'hides' the 
+default no-args constructor and throws a silent error:
+```java
+@Data
+@Builder
+@Entity
+@Table(name="fishing_ground")
+public class FishingGround {
+    // ...
+}
+```
+Error/warning:
+`org.hibernate.tuple.PojoInstantiator     : HHH000182: No default (no-argument) constructor for class: sk.catheaven.graphqlserver.domain.persistence.FishingGround (class must be instantiated by Interceptor)`
+
+This would result in `NullPointerException` and has simple workaround. Defining `@NoArgsConstructor` is not enough, but
+defining both `@NoArgsConstructor` and `@AllArgsConstructor` does the deal:
+
+```java
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name="fishing_ground")
+public class FishingGround {
+    // ... 
+}
+```
