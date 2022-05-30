@@ -1,7 +1,7 @@
 type Catch {
     id: ID!
-    fish: Fish!
+    fishID: ID!
     totalAmount:Int!
     totalWeight: Float!
-    attendance: Attendance!
+    attendance: Attendance!    # need to consider !
 }

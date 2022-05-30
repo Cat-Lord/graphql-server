@@ -1,3 +1,4 @@
 extend type Query {
-    allFish: [Fish]
+    allFish: [Fish!]!
+    getFishById(id: ID!): Fish
 }

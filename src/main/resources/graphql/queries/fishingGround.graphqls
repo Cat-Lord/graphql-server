@@ -1,4 +1,4 @@
 extend type Query {
-    allFishingGround: [FishingGround]
-    getAllFishingGroundsStatistics: [FishingGroundStatistics]
+    allFishingGround: [FishingGround!]!
+    getAllFishingGroundsStatistics: [FishingGroundStatistics!]!
 }

@@ -1,0 +1,9 @@
+input NewCatch {
+    fishID: ID!
+    totalAmount:Int!
+    totalWeight: Float!
+}
+
+type Mutation {
+    addAttendance(fishingGroundID: ID!, totalVisits: Int!, catches: [NewCatch!]): ID
+}
