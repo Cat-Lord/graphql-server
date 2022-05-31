@@ -1,0 +1,10 @@
+type AttendanceStatistics {
+    fishingGround: FishingGround!
+    totalNumberOfVisits: Int!
+    totalAmount: Int!
+    totalWeight: Float!
+}
+
+extend type Query {
+    allFishingGroundsStatistics: [AttendanceStatistics!]
+}

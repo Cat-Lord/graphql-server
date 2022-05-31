@@ -2,7 +2,6 @@ package sk.catheaven.graphqlserver.resolvers;
 
 import graphql.kickstart.tools.GraphQLQueryResolver;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sk.catheaven.graphqlserver.domain.persistence.Fish;
 import sk.catheaven.graphqlserver.repository.FishRepository;

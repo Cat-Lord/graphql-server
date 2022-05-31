@@ -31,3 +31,13 @@ INSERT INTO fishing_ground(code, label)
               ('0866', 'Štelc a Výkopa'),
               ('0480', 'Požiarna nádrž'),
               ('0410', 'Morava č. 3');
+
+INSERT INTO attendance (id, number_of_visits, fishing_ground_id)
+        VALUES (1,123,6),
+               (2,168,2),
+               (3,17,5);
+
+INSERT INTO catch (id, total_amount, total_weight, attendance_id, fish_id)
+        VALUES (1, 3, 5.0, 2, 2),
+               (2, 1, 8.0, 2, 10),
+               (3, 2, 6.0, 3, 1);

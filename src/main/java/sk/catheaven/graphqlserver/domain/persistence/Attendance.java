@@ -2,7 +2,6 @@ package sk.catheaven.graphqlserver.domain.persistence;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.CascadeType;
@@ -13,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,10 @@ import java.util.List;
 public class Attendance {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "att_seq",
+            sequenceName = "attendance_sequence_generator",
+            initialValue = 50, allocationSize = 11)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "att_seq")
     private Long id;
 
     @ManyToOne

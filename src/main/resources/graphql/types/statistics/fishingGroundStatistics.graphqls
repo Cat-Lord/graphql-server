@@ -1,6 +1,0 @@
-type FishingGroundStatistics {
-    fishingGround: FishingGround
-    totalAmount: Int
-    totalWeight: Float
-    totalNumberOfVisits: Int
-}

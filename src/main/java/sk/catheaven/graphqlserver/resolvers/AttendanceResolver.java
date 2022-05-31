@@ -2,7 +2,6 @@ package sk.catheaven.graphqlserver.resolvers;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import sk.catheaven.graphqlserver.domain.attendance.NewCatch;
 import sk.catheaven.graphqlserver.domain.persistence.Attendance;
@@ -11,10 +10,10 @@ import sk.catheaven.graphqlserver.domain.persistence.Fish;
 import sk.catheaven.graphqlserver.domain.persistence.FishingGround;
 import sk.catheaven.graphqlserver.repository.AttendanceRepository;
 import sk.catheaven.graphqlserver.repository.CatchRepository;
+
 import java.util.Arrays;
 import java.util.List;
 
-@Log4j2
 @Service
 @AllArgsConstructor
 public class AttendanceResolver implements GraphQLMutationResolver {
@@ -44,4 +43,6 @@ public class AttendanceResolver implements GraphQLMutationResolver {
 
         return attendanceRepository.save(attendance).getId();
     }
+
+
 }

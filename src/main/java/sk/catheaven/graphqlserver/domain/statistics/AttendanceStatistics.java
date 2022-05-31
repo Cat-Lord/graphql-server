@@ -9,14 +9,14 @@ import sk.catheaven.graphqlserver.domain.persistence.FishingGround;
  * NOT an entity.
  */
 @Data
-public class FishingGroundStatistics {
+public class AttendanceStatistics {
     
     private FishingGround fishingGround;
     private Long totalAmount;
     private Double totalWeight;
     private Long totalNumberOfVisits;
 
-    public FishingGroundStatistics(FishingGround fishingGround, Long totalNumberOfVisits, Long totalAmount, Double totalWeight) {
+    public AttendanceStatistics(FishingGround fishingGround, Long totalNumberOfVisits, Long totalAmount, Double totalWeight) {
         this.fishingGround = fishingGround;
         this.totalNumberOfVisits = totalNumberOfVisits;
         this.totalAmount = totalAmount;

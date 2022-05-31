@@ -2,9 +2,9 @@ package sk.catheaven.graphqlserver.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import sk.catheaven.graphqlserver.domain.statistics.CatchStatistics;
 import sk.catheaven.graphqlserver.domain.persistence.Catch;
 import sk.catheaven.graphqlserver.domain.persistence.FishingGround;
+import sk.catheaven.graphqlserver.domain.statistics.CatchStatistics;
 
 import java.util.List;
 
