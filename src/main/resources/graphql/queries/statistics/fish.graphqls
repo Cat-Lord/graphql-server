@@ -1,0 +1,9 @@
+type FishStatistics {
+    fish: Fish!
+    totalWeight: Float!
+    totalAmount: Int!
+}
+
+extend type Query {
+    allFishStatistics: [FishStatistics!]
+}

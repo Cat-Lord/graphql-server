@@ -1,6 +1,0 @@
-type CatchStatistics {
-    fish: Fish
-    totalWeight: Float
-    totalAmount: Int
-}
-

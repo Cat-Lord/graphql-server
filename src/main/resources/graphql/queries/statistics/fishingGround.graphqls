@@ -1,0 +1,14 @@
+type CatchStatistics {
+    fish: Fish!
+    totalWeight: Float!
+    totalAmount: Int!
+}
+
+type FishingGroundCatchStatistics {
+    fishingGround: FishingGround!
+    catchStatistics: [CatchStatistics!]!
+}
+
+extend type Query {
+    allFishingGroundCatchStatistics: [FishingGroundCatchStatistics!]
+}

@@ -6,5 +6,5 @@ type AttendanceStatistics {
 }
 
 extend type Query {
-    allFishingGroundsStatistics: [AttendanceStatistics!]
+    allAttendanceStatistics: [AttendanceStatistics!]
 }

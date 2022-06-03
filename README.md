@@ -225,3 +225,28 @@ public class FishingGround {
     // ... 
 }
 ```
+
+## Hibernate HQL Subquery with List Result
+I tried to create one statistics object with the usage of one single query. It is not possible with pure SQL but it 
+could be possible if hibernate accounts for that. Turns out [it really isn't possible](https://stackoverflow.com/questions/12379238/hql-new-list-within-new-object)
+(probably).
+
+My last query attempt was:
+
+```java
+@Query(" SELECT new sk.catheaven.graphqlserver.domain.statistics.FishingGroundCatchStatistics( " +
+        "                        fg, " +
+        "                        (SELECT new sk.catheaven.graphqlserver.domain.statistics.CatchStatistics(" +
+        "                                                   catch.fish, " +
+        "                                                   COALESCE(SUM(catch.totalAmount), 0), " +
+        "                                                   COALESCE(SUM(catch.totalWeight), 0)" +
+        "                                                ) " +
+        "                            FROM Catch catch " +
+        "                            GROUP BY catch.attendance.fishingGround, catch.fish " +
+        "                            HAVING   catch.attendance.fishingGround = fg" +
+        "                        ) " +
+        "           ) " +
+        "        FROM FishingGround fg")
+List<FishingGroundCatchStatistics> allFishingGroundCatchStatistics();
+
+```
