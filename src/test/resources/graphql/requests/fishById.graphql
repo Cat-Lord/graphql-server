@@ -1,0 +1,6 @@
+query FishById($id: ID!) {
+    getFishById(id: $id) {
+        id
+        name
+    }
+}

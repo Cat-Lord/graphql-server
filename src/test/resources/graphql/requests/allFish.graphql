@@ -1,0 +1,6 @@
+query AllFish {
+    allFish {
+        id
+        name
+    }
+}

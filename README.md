@@ -52,7 +52,30 @@ results down in the terminal `Query Results` tab. Neat !
 Not only we get environment to test our queries, but also autocompletion out of the box !!! See the result in the
 image below:
 
-![GraphQL from within IntelliJ](./src/main/resources/static/graphql-idea-plugin.png)
+![GraphQL Tools from within IntelliJ](.markdown/graphql-idea-plugin.png)
+
+## Request-Response example
+
+> Request
+```json
+{
+  "operationName":"AllFishTestQuery",
+  "variables":{},
+  "query":"query AllFishTestQuery {\n  allFish {\n    id\n    name\n  }\n}\n"
+}
+```
+
+> Response
+```json
+{
+  "data": {
+    "allFish":[
+      {"id":"1","name":"Kapor"},
+      {"id":"2","name":"Štuka"}
+    ]
+  }
+}
+```
 
 # Instantiating GraphQL
 There are multiple available implementations of GraphQL within Java. There are several possibilities on 
@@ -128,11 +151,145 @@ Default: `private String schemaLocationPattern = "**/*.graphqls";`
 Can be changed in `application.properties` via `graphql.servlet.mapping=/your-endpoint`. Note that changing this
 location can affect other tools such as GraphiQL which expects schema to be at `/graphql`.
 
+# Testing
+For testing, we will use JUnit 5 with Spring's already bundled packages like Mockito.
+
+## Parameterized Tests
+One of the new features that was introduced in JUnit 5 is the support of parameterized tests. These tests are just regular
+tests with the option to enable parameters that will be supplied to the test method when executing. See the example below
+for a clear implementation sample:
+
+```java
+@ParameterizedTest
+@ValueSource(ints = {1, 3, 5, -3, 15, Integer.MAX_VALUE}) // six different values will be passed in and used as test data   
+void isOdd_ShouldReturnTrueForOddNumbers(int number) {
+    assertTrue(Numbers.isOdd(number));
+}
+```
+
+## Base Setup
+For a typical test we need a Spring configuration. This is achieved via 2 annotations:
+- `@SpringBootTest`: Initializes application context as if we're running in a common Spring environment.
+- `@ExtendWith(SpringExtension.class)`: Makes Spring aware of JUnit lifecycle notifications. This annotation is already
+included in the `@SpringBootTest` annotation.
+- `@AutoConfigureMockMvc`: Creates an environment for MVC applications with full support of request/response 
+interactions via a mock server instead of a real one. 
+- `@Import(TestConfig.class)`: Custom class configuring beans created specifically for testing. Used only if required.
+
+A test class should then look something like this:
+
+```java
+@SpringBootTest
+@AutoConfigureMockMvc
+@Import(TestConfig.class)
+public class SomeTest {
+    
+}
+```
+
+Note that tutorials online suggest using `@ExtendWith(SpringExtension.class)` but if we take a look at `@SpringBootTest` 
+we can see that this annotation is already included. Furthermore, there is another essential configuration when using 
+JUnit specifically: `@SpringJUnitConfig(TestConfig.class)` and `@SpringJUnitWebConfig(TestConfig.class)`.
+
+### Mocking
+Mocking a request/response is necessary for web environment tests. We do this by creating a request with a predefined 
+return value(s) with the help of [MockMvc](https://docs.spring.io/spring-framework/docs/current/reference/html/testing.html#spring-mvc-test-framework).
+Steps to mock a request and validate the response now consists usually of:
+
+1. Mock service that is being tested, usually with the help of `@MockBean` Mockito annotation.
+2. In the test, Mock a sample response (list of objects, objects, numbers, ...) to a specific action.
+3. Trigger the action (get, post or other HTTP methods) with the help of `MockMvc` and expect results.
+4. Make assertions of response.
+
+## How to test GraphQL ?
+With GraphQL we don't need to manually wire every request. GraphQL exposes a single endpoint: `/graphql`. All the queries, 
+mutations and other interactions with the GraphQL server are supplied as body of a POST request to this endpoint. An 
+example of a request can be seen below. Notice that text formatting is also preserved (new line characters are sent to the server):
+
+```json
+{
+  "operationName":"AllFishStatistics",
+  "variables":{},
+  "query":"query AllFishStatistics {\n  allFishStatistics {\n    fish {\n      id\n      name\n    }\n    totalWeight\n    totalAmount\n  }\n}\n"
+}
+```
+
+There are a few consequences of this behaviour:
+- Typical Spring application doesn't implement any controllers. Body of a request is handled by libraries. Therefore, we
+  cannot test specific endpoints like in a traditional REST application (i.e. `/cats` or `cat/{id}`).
+- We need to create GraphQL tests with specific request fields and create sensible defaults if necessary.
+
+Since all requests are of HTTP POST and usually point towards the same endpoint, we can utilize an existing 
+`graphql-spring-boot-starter-test` dependency from `graphql-java-kickstart`.
+Using this library provides us with neat test annotations like `@GraphQLTest` or utility tools that wrap our requests
+as described above and return a response back (done by `GraphQLTestTemplate`). It appears that the GraphQL server has
+undefined initial state.
+
+Minimalistic approach to the test configuration can be as follows:
+
+```java
+import static org.mockito.Mockito.doReturn;
+import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
+// ...
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class SomeGraphQLTest {
+
+    @MockBean
+    SomeResolver resolver;
+
+    @Autowired
+    GraphQLTestTemplate graphQLTestTemplate;
+
+    @Test
+    void test() {
+        String nameMock = "sample-test-name";
+        doReturn(nameMock).when(resolver).getUserName();
+        // load a text file with the request just like when
+        // issuing it from the client and fire a POST request
+        GraphQLResponse response = graphQLTestTemplate.postForResource("graphql/sampleRequest.graphql");
+        
+        assertTrue(response.isOk());
+        // ...
+    }
+}
+```
+
+```graphql
+# graphql/sampleRequest.graphql
+query SampleQuery {
+    getUser {
+        name
+    }
+}
+```
+
+### Asserting data
+Using `MockMvc` we can `perform` a request and immediately assert it using `andExpect` and other assertions. These methods
+are not available when using the `GraphQLTestTemplate` object. We can use several `get...()` methods supplied by the 
+returned response of `GraphQLResponse` type. These methods expect us to declare "path" to the JSON Object, JSON array, etc. 
+that should be accessible on the response object. Usage is simple:
+
+```java
+GraphQLResponse response = graphQLTestTemplate.postForResource("graphql/requests/allFish.graphql");
+List<Fish> list = response.getList("data.allFish", Fish.class);
+```
+
+Other available assertions are supported directly via the `GraphQLTestTemplate` and start with `assertThat...()`. These 
+use the [JSONPath syntax](https://support.smartbear.com/alertsite/docs/monitors/api/endpoint/jsonpath.html#notation).
+Through these methods we can access any property from the response and assert it directly:
+
+```java
+GraphQLResponse response = graphQLTestTemplate.postForResource("graphql/requests/allFish.graphql");
+response.assertThatField("$.data").isNotNull();
+response.assertThatField("$.*.allFish").isNotNull();
+```
+
 # Common Issues
 
 ## GraphQL Server not available
-There is no GraphQL endpoint at `/graphql`. This can be caused by number of issues and one of them might be 
-missing query handlers. If there are no handler I suspect that the server doesn't even start. But be aware, 
+There is no GraphQL endpoint at `/graphql`. This can be caused by number of issues and one of them might be
+missing query handlers. If there are no handler I suspect that the server doesn't even start. But be aware,
 that creating a handler implementing GraphQLResolver interface isn't enough - it has to be picked up by Spring,
 so it is necessary to annotate it with `@Component` (or any other suitable annotation):
 
@@ -190,14 +347,14 @@ one single file, but that is not a feasible solution.
 
 I discovered that naming and **file extension matters**. While for some reason
 having files named `.graphql` works in a mysterious way (sometimes yes, sometimes no),
-naming them `.graphqls` is the safer option. 
+naming them `.graphqls` is the safer option.
 
-I suspect that root schema definitions **must** be in a `.graphqls` file. Providing the schema 
-with new types may be in a regular `.graphql` files and is fetched by the graphql-tools. 
+I suspect that root schema definitions **must** be in a `.graphqls` file. Providing the schema
+with new types may be in a regular `.graphql` files and is fetched by the graphql-tools.
 Nevertheless, I would always recommend to always extend files with `.graphqls`.
 
 ## Lombok @Builder with JPA repositories
-There is an issue with JPA repositories and the @Builder annotation. Using just pure builder annotation 'hides' the 
+There is an issue with JPA repositories and the @Builder annotation. Using just pure builder annotation 'hides' the
 default no-args constructor and throws a silent error:
 ```java
 @Data
@@ -227,7 +384,7 @@ public class FishingGround {
 ```
 
 ## Hibernate HQL Subquery with List Result
-I tried to create one statistics object with the usage of one single query. It is not possible with pure SQL but it 
+I tried to create one statistics object with the usage of one single query. It is not possible with pure SQL but it
 could be possible if hibernate accounts for that. Turns out [it really isn't possible](https://stackoverflow.com/questions/12379238/hql-new-list-within-new-object)
 (probably).
 
@@ -248,5 +405,10 @@ My last query attempt was:
         "           ) " +
         "        FROM FishingGround fg")
 List<FishingGroundCatchStatistics> allFishingGroundCatchStatistics();
-
 ```
+
+## `@GraphQLTest` annotation not working
+Even though there is an annotation already available for GraphQL tests (namely `@GraphQLTest` as class-level element) it
+[doesn't seem to work](https://github.com/graphql-java-kickstart/graphql-spring-boot/discussions/267). It should be 
+configuring the `@SpringBootTest` annotation by default, but it seems that there are issues with this configuration and
+some beans are therefore undefined.

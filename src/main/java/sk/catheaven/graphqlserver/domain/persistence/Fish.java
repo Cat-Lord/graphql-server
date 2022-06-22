@@ -2,6 +2,7 @@ package sk.catheaven.graphqlserver.domain.persistence;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
@@ -15,6 +16,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Data   // TODO
 @Entity
 @Table(name="fish")
 public class Fish {
