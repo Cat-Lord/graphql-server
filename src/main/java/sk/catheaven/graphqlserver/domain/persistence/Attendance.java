@@ -48,4 +48,28 @@ public class Attendance {
     public Long getId() {
         return id;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public FishingGround getFishingGround() {
+        return fishingGround;
+    }
+
+    public void setFishingGround(FishingGround fishingGround) {
+        this.fishingGround = fishingGround;
+    }
+
+    public Integer getNumberOfVisits() {
+        return numberOfVisits;
+    }
+
+    public void setNumberOfVisits(Integer numberOfVisits) {
+        this.numberOfVisits = numberOfVisits;
+    }
+
+    public List<Catch> getCatches() {
+        return catches;
+    }
 }

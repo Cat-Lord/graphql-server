@@ -15,13 +15,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static sk.catheaven.graphqlserver.testingUtils.Assertions.assertCollectionEquals;
 
+@Log4j2
 
 @DisplayName("FishResolver")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -43,7 +43,8 @@ public class FishResolverGraphqlTest {
         GraphQLResponse response = graphQLTestTemplate.postForResource("graphql/requests/allFish.graphql");
 
         assertTrue(response.isOk());
-        assertDoesNotThrow(() -> response.assertThatDataField().isNotNull());
+        response.assertThatDataField();
+        response.assertThatNoErrorsArePresent();
         response.assertThatField("$.data").isNotNull();
         response.assertThatField("$.*.allFish").isNotNull();
         var list = response.getList("data.allFish", Fish.class);
@@ -63,7 +64,8 @@ public class FishResolverGraphqlTest {
         GraphQLResponse response = graphQLTestTemplate.postForResource("graphql/requests/allFish.graphql");
 
         assertTrue(response.isOk());
-        assertDoesNotThrow(() -> response.assertThatDataField().isNotNull());
+        response.assertThatDataField();
+        response.assertThatNoErrorsArePresent();
         response.assertThatField("$.data").isNotNull();
         response.assertThatField("$.*.allFish").isNotNull();
 
@@ -82,7 +84,8 @@ public class FishResolverGraphqlTest {
 
         GraphQLResponse response = graphQLTestTemplate.perform("graphql/requests/fishById.graphql", variables);
         assertTrue(response.isOk());
-        assertEquals(expectedResult, response.get("data.getFishById", Fish.class));
+        response.assertThatNoErrorsArePresent();
+        assertEquals(expectedResult, response.get("data.fish", Fish.class));
     }
 
     @Test
@@ -94,5 +97,7 @@ public class FishResolverGraphqlTest {
 
         GraphQLResponse response = graphQLTestTemplate.perform("graphql/requests/fishById.graphql", variables);
         assertTrue(response.isOk());
+        response.assertThatNoErrorsArePresent();
+        response.assertThatField("$.data.fish").isNull();
     }
 }

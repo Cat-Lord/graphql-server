@@ -46,4 +46,43 @@ public class Catch {
     @ManyToOne
     private Attendance attendance;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Fish getFish() {
+        return fish;
+    }
+
+    public void setFish(Fish fish) {
+        this.fish = fish;
+    }
+
+    public Integer getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(Integer totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public Double getTotalWeight() {
+        return totalWeight;
+    }
+
+    public void setTotalWeight(Double totalWeight) {
+        this.totalWeight = totalWeight;
+    }
+
+    public Attendance getAttendance() {
+        return attendance;
+    }
+
+    public void setAttendance(Attendance attendance) {
+        this.attendance = attendance;
+    }
 }

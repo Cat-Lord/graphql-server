@@ -155,15 +155,44 @@ location can affect other tools such as GraphiQL which expects schema to be at `
 For testing, we will use JUnit 5 with Spring's already bundled packages like Mockito.
 
 ## Parameterized Tests
-One of the new features that was introduced in JUnit 5 is the support of parameterized tests. These tests are just regular
-tests with the option to enable parameters that will be supplied to the test method when executing. See the example below
-for a clear implementation sample:
+One of the new features that was introduced in JUnit 5 is the support of 
+[parameterized tests](https://junit.org/junit5/docs/current/user-guide/#writing-tests-parameterized-tests). These tests are 
+just regular tests with the option to enable parameters that will be supplied to the test method when executing. See 
+the example below for a clear implementation sample:
 
 ```java
 @ParameterizedTest
 @ValueSource(ints = {1, 3, 5, -3, 15, Integer.MAX_VALUE}) // six different values will be passed in and used as test data   
 void isOdd_ShouldReturnTrueForOddNumbers(int number) {
     assertTrue(Numbers.isOdd(number));
+}
+```
+
+There are many options on how to obtain values for our parametrized test. One way, suitable for more complex data, can 
+be a method denoted by the `@MethodSource` annotation. The supplier is a static method (unless the class lifecycle is 
+`@TestInstance(Lifecycle.PER_CLASS)`) which returns a stream of arguments. It should not obtain any parameters. 
+Parametrized method that gets values from a supplier can either use the annotation in it's "pure" form or provide it
+with the name of the supplier method `@MethodSource("getSampleProducts")`.
+
+```java
+@SpringBootTest
+class AttendanceResolverTest {
+    
+    @ParameterizedTest
+    @MethodSource("stringArgs")
+    void testStrings(String arg, int num) {
+        // ...repeated for every argument
+    }
+    
+    private static Arguments<String> getArgs() {
+        return Stream.of(
+                Arguments.of("sample", 0),
+                Arguments.of("other sample", 5),
+                Arguments.of("121323121412", -1),
+                Arguments.of("    ", 0),
+                Arguments.of("?", 12)
+        )
+    }    
 }
 ```
 
@@ -277,12 +306,40 @@ List<Fish> list = response.getList("data.allFish", Fish.class);
 
 Other available assertions are supported directly via the `GraphQLTestTemplate` and start with `assertThat...()`. These 
 use the [JSONPath syntax](https://support.smartbear.com/alertsite/docs/monitors/api/endpoint/jsonpath.html#notation).
-Through these methods we can access any property from the response and assert it directly:
+Through these methods we can access any property from the response and assert it directly. Notice that assertion methods
+offer basic conversion between GraphQL types and let us use these value to further asses the response.
 
 ```java
 GraphQLResponse response = graphQLTestTemplate.postForResource("graphql/requests/allFish.graphql");
 response.assertThatField("$.data").isNotNull();
 response.assertThatField("$.*.allFish").isNotNull();
+response.assertThatField("$.data.fish.id").asInteger().isEqualTo(1);
+response.assertThatField("$.data.id").as(Long.class).isEqualTo(attendanceId);       // convert to Java Type if necessary
+
+```
+
+### Mocking requests
+Mocking is easily done with `GraphQLTestTemplate` as already mentioned. It provides way of automatically loading 
+request file from string path and offers more detailed `perform` operation in case we need to use variables for mutations.
+This can be tricky if we have nested variables and arrays, but it only requires some Jackson serialization magic to work.
+
+Serializing variables is simple. For starters, we need to create an `ObjectNode` via the `ObjectMapper`. After that
+we just `put` variables into it:
+
+```java
+ObjectNode variables = mapper.createObjectNode();
+variables.put("id", mockFish.getId());
+variables.put("amount", totalAmount);
+
+// array of objects as input
+ArrayNode newCatchesVariable = mapper.valueToTree(newCatches);
+variables.putArray("catches").addAll(newCatchesVariable);
+        
+// note that THIS WILL NOT work - call to `addAll()` is ambiguous ! ! !
+//variables.putArray("catches").addAll(mapper.valueToTree(newCatchesList));
+
+var response = graphQLTestTemplate.perform("graphql/mutations/someChange.graphql", variables);
+// ...
 ```
 
 # Common Issues

@@ -1,5 +1,5 @@
 query FishById($id: ID!) {
-    getFishById(id: $id) {
+    fish: getFishById(id: $id) {
         id
         name
     }

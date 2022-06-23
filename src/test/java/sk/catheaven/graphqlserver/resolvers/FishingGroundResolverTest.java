@@ -36,6 +36,7 @@ public class FishingGroundResolverTest {
         GraphQLResponse response = graphQLTestTemplate.postForResource("graphql/requests/allFishingGround.graphql");
 
         response.assertThatDataField();
+        response.assertThatNoErrorsArePresent();
         assertEquals(Collections.emptyList(), response.getList("data.list", FishingGround.class));
     }
 
@@ -53,6 +54,7 @@ public class FishingGroundResolverTest {
         GraphQLResponse response = graphQLTestTemplate.postForResource("graphql/requests/allFishingGround.graphql");
 
         response.assertThatDataField();
+        response.assertThatNoErrorsArePresent();
         Assertions.assertCollectionEquals(expectedList, response.getList("data.list", FishingGround.class));
     }
 }
