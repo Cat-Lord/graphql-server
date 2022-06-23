@@ -3,6 +3,7 @@ package sk.catheaven.graphqlserver.resolvers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.graphql.spring.boot.test.GraphQLResponse;
 import com.graphql.spring.boot.test.GraphQLTestTemplate;
+import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static sk.catheaven.graphqlserver.testingUtils.Assertions.assertCollectionEquals;
 
 
 @DisplayName("FishResolver")
@@ -51,7 +53,11 @@ public class FishResolverGraphqlTest {
     @Test
     @DisplayName("returns list of fish")
     public void allFish() throws IOException {
-        var expectedResult = List.of(new Fish(1L,"Test fish 1"));
+        var expectedResult = List.of(
+                new Fish(1L,"Test fish 1"),
+                new Fish(2L,"Test fish 2"),
+                new Fish(3L,"Test fish 3")
+        );
         doReturn(expectedResult).when(fishResolver).allFish();
 
         GraphQLResponse response = graphQLTestTemplate.postForResource("graphql/requests/allFish.graphql");
@@ -62,8 +68,7 @@ public class FishResolverGraphqlTest {
         response.assertThatField("$.*.allFish").isNotNull();
 
         var list = response.getList("data.allFish", Fish.class);
-        assertEquals(expectedResult.size(), list.size());
-        assertEquals(expectedResult.get(0), list.get(0));
+        assertCollectionEquals(expectedResult, list);
     }
 
     @Test
