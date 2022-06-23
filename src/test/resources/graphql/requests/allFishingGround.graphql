@@ -1,0 +1,7 @@
+query AllFishingGround {
+    list: allFishingGround {
+        id
+        code
+        label
+    }
+}
